@@ -28,5 +28,5 @@ export async function submitReview(rating: number, comment: string, sharePhoto: 
   const reference = doc(database(), "reviews", user.uid);
   if ((await getDoc(reference)).exists()) throw new Error("Você já enviou uma avaliação. Cada conta pode enviar uma avaliação.");
   const picture = typeof token.claims.picture === "string" ? token.claims.picture : "";
-  await setDoc(reference, { userId: user.uid, publicName: name, photoURL: sharePhoto ? picture : "", rating, comment: clean, createdAt: serverTimestamp(), status: "pending" });
+  await setDoc(reference, { userId: user.uid, publicName: name, photoURL: sharePhoto ? picture : "", rating, comment: clean, createdAt: serverTimestamp(), status: "approved" });
 }

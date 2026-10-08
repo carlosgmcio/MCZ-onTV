@@ -36,7 +36,7 @@ test("reviews reject invalid stars and enforce trimmed comment limits", () => {
   for (const comment of ["short", " ".repeat(20), "x".repeat(1001)]) assert.throws(() => validation.validateReview(5, comment));
   assert.equal(validation.validateReview(1, "  Test comment here  "), "Test comment here");
 });
-test("submission uses authenticated token identity, a UID-specific document and pending server timestamp", async () => {
+test("submission uses authenticated token identity, a UID-specific document and approved server timestamp", async () => {
   const h = harness();
   await h.submitReview(4, "  Test comment only  ", false);
   const { reference, data } = h.writes[0];
@@ -44,7 +44,7 @@ test("submission uses authenticated token identity, a UID-specific document and 
   assert.equal(data.userId, "test-account-uid");
   assert.equal(data.publicName, "Test");
   assert.equal(data.photoURL, "");
-  assert.equal(data.status, "pending");
+  assert.equal(data.status, "approved");
   assert.equal(data.createdAt, "server-time");
   assert.equal(data.comment, "Test comment only");
   assert.ok(!("email" in data));
@@ -67,4 +67,15 @@ test("only approved reviews are queried and rendered, with bounded newest-first 
   h.emit([{ ...review, status: "pending" }, { ...review, status: "approved" }]);
   assert.equal(result.length, 1);
   assert.equal(result[0].photoURL, "");
+});
+
+
+test("rules require approved creation and retain all security guards", () => {
+  const rules = fs.readFileSync("firestore.rules", "utf8");
+  assert.ok(rules.includes("request.resource.data.status == 'approved'"));
+  assert.ok(!rules.includes("request.resource.data.status == 'pending'"));
+  for (const guard of ["reviewId == request.auth.uid", "request.resource.data.userId == request.auth.uid", "request.auth.token.name is string", "request.resource.data.publicName == request.auth.token.name.split(' ')[0]", "request.resource.data.photoURL == request.auth.token.get('picture', '')", "request.resource.data.rating is int", "request.resource.data.rating >= 1", "request.resource.data.rating <= 5", "request.resource.data.comment.size() >= 10", "request.resource.data.comment.size() <= 1000", "request.resource.data.createdAt == request.time", "allow update, delete: if false", "request.query.limit <= 24", "hasOnly(", "google.com"]) assert.ok(rules.includes(guard), guard);
+  const ui = fs.readFileSync("app/components/reviews.tsx", "utf8");
+  assert.ok(ui.includes("foi publicada com sucesso."));
+  assert.ok(!/após análise|após aprovação|passam por análise/.test(ui));
 });

@@ -38,11 +38,15 @@ test("contracting requires plan choice and creates correctly encoded plan-specif
   assert.equal(choose.link, undefined);
   assert.equal(choose.options.length, 4);
   for (const plan of plans.plans) {
-    const reply = assistant.assistantReply(`plano:${plan.id}`);
+    let state = assistant.assistantReducer(assistant.initialAssistantState, { id: `plano:${plan.id}`, label: plan.name });
+    assert.equal(state.reply.link, undefined);
+    assert.equal(state.selectedPlan.id, plan.id);
+    state = assistant.assistantReducer(state, { id: "continuar", label: "Continue" });
+    const reply = state.reply;
     const url = new URL(reply.link.href);
     assert.equal(url.origin, "https://wa.me");
     assert.equal(url.pathname, "/5582994310121");
-    assert.ok(url.searchParams.get("text").includes(`Plano de interesse: ${plan.name}.`));
+    assert.ok(url.searchParams.get("text").includes(`Plano escolhido: ${plan.name}`));
     assert.ok(url.searchParams.get("text").includes("Assistente MCZ"));
   }
 });
@@ -89,4 +93,31 @@ test("referral requires first payment and guided history survives returning home
   assert.equal(state.reply.options.length, 6);
   assert.equal(assistant.initialAssistantState.messages.length, 0);
   assert.equal(assistant.assistantReply("unknown").text, assistant.welcomeText);
+});
+
+
+test("selected plan survives every guided flow and swapping updates summary and contact", () => {
+  let state = assistant.assistantReducer(assistant.initialAssistantState, { id: "plano:mensal", label: "Mensal" });
+  for (const id of ["detalhes", "promocao", "funciona", "indicacao", "inicio", "aparelhos", "aparelho:0", "compat:samsung", "planos"]) {
+    state = assistant.assistantReducer(state, { id, label: id });
+    assert.equal(state.selectedPlan.id, "mensal");
+  }
+  state = assistant.assistantReducer(state, { id: "trocar", label: "Swap" });
+  assert.equal(state.reply.options.length, 4);
+  state = assistant.assistantReducer(state, { id: "plano:anual", label: "Anual" });
+  assert.equal(state.reply.link, undefined);
+  state = assistant.assistantReducer(state, { id: "continuar", label: "Continue" });
+  assert.ok(state.reply.text.includes("Plano: Anual"));
+  assert.ok(state.reply.text.includes("R$230,00 / 12 meses"));
+  const message = new URL(state.reply.link.href).searchParams.get("text");
+  assert.ok(message.includes("Samsung"));
+  assert.ok(message.includes("elegibilidade a confirmar"));
+  assert.ok(message.includes("Plano escolhido: Anual"));
+});
+
+test("final summary contains no device or promotion assumptions", () => {
+  let state = assistant.assistantReducer(assistant.initialAssistantState, { id: "plano:trimestral", label: "Trimestral" });
+  state = assistant.assistantReducer(state, { id: "continuar", label: "Continue" });
+  assert.ok(!state.reply.text.includes("Aparelho/sistema consultado"));
+  assert.ok(!state.reply.text.includes("Interesse na"));
 });

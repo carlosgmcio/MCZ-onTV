@@ -68,12 +68,12 @@ export function Reviews() {
     <dialog ref={dialog} className="review-dialog" aria-labelledby="review-question" onCancel={(event) => { event.preventDefault(); close(); }} onClick={(event) => { if (event.target === event.currentTarget) { const box = event.currentTarget.getBoundingClientRect(); if (event.clientX < box.left || event.clientX > box.right || event.clientY < box.top || event.clientY > box.bottom) close(); } }}>
       <button type="button" className="demo-close review-close" onClick={close} aria-label="Fechar avaliação">×</button>
       <h2 id="review-question">Como você avalia sua experiência com a MCZ onTV?</h2>
-      {sent ? <p role="status" className="review-thanks">Obrigado! 💙 Sua avaliação foi enviada e será publicada após análise.</p> : <form onSubmit={send}>
+      {sent ? <p role="status" className="review-thanks">Obrigado! 💙 Sua avaliação foi publicada com sucesso.</p> : <form onSubmit={send}>
         <fieldset disabled={busy}><legend>Selecione sua nota</legend><div className="review-rating">{[1, 2, 3, 4, 5].map((value) => <label key={value}><input type="radio" name="review-rating" value={value} checked={rating === value} onChange={() => setRating(value)} required /><span aria-hidden="true" className={value <= rating ? "selected" : ""}>★</span><span className="sr-only">{value} {value === 1 ? "estrela" : "estrelas"}</span></label>)}</div></fieldset>
         <label className="review-label" htmlFor="review-comment">Seu comentário</label><textarea id="review-comment" value={comment} onChange={(event) => setComment(event.target.value)} minLength={REVIEW_MIN_LENGTH} maxLength={REVIEW_MAX_LENGTH} rows={5} required disabled={busy} aria-describedby="review-privacy" />
-        <p className="reviews-note">{comment.length}/{REVIEW_MAX_LENGTH} caracteres</p><p id="review-privacy" className="reviews-note">Seu primeiro nome e comentário serão públicos após aprovação. Não inclua dados pessoais no comentário. Seu e-mail não será publicado.</p>
+        <p className="reviews-note">{comment.length}/{REVIEW_MAX_LENGTH} caracteres</p><p id="review-privacy" className="reviews-note">Seu primeiro nome e comentário serão públicos ao enviar a avaliação. Não inclua dados pessoais no comentário. Seu e-mail não será publicado.</p>
         {user?.photoURL && <label className="review-photo-choice"><input type="checkbox" checked={sharePhoto} onChange={(event) => setSharePhoto(event.target.checked)} disabled={busy} /> Autorizar publicação da minha foto do Google.</label>}
-        <p className="reviews-note">Uma avaliação por conta Google. O login não comprova uma contratação; os relatos passam por análise.</p>
+        <p className="reviews-note">Uma avaliação por conta Google. O login não comprova uma contratação.</p>
         {error && <p className="auth-error" role="alert">{error}</p>}<button type="submit" className="primary-button" disabled={busy || !user || !rating} aria-busy={busy}>{busy ? "ENVIANDO…" : "ENVIAR AVALIAÇÃO"}</button>
       </form>}
     </dialog>

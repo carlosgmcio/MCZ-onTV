@@ -2,9 +2,9 @@
 
 ## Avaliações de clientes
 
-Avaliações reais com login Google, Firestore e moderação manual. Novos relatos
-ficam `pending`; apenas `approved` aparece publicamente. Uma avaliação por conta.
-Veja [configuração, regras e aprovação segura](docs/reviews.md) antes de ativar:
+Avaliações reais com login Google, Firestore e publicação automática. Novos relatos
+ficam `approved`; apenas `approved` aparece publicamente. Uma avaliação por conta.
+Veja [configuração, regras e publicação automática](docs/reviews.md) antes de ativar:
 é necessário publicar as regras e criar o índice no Firebase existente.
 
 ## Assistente Virtual MCZ
@@ -120,8 +120,9 @@ A oferta é **R$15,00/mês durante os 6 primeiros meses**; depois, R$25,00/mês.
 É exclusiva para novos clientes. Os demais planos são R$60,00 por 3 meses,
 R$120,00 por 6 meses e R$230,00 por 12 meses.
 
-Planos e mensagens estão centralizados em `lib/site/plans.ts`. Todos os botões
-abrem o WhatsApp **(82) 99431-0121**, com o plano selecionado na mensagem.
+Planos e mensagens estão centralizados em `lib/site/plans.ts`. Os quatro cards
+abrem o Assistente MCZ com o plano selecionado. Após o resumo, o botão final
+abre o WhatsApp **(82) 99431-0121**, com plano, valor e contexto consultado.
 O usuário ainda precisa enviar a mensagem; contratação e atendimento são manuais.
 
 ## Desenvolvimento
@@ -180,7 +181,7 @@ Após configurar as variáveis:
 2. Entre com Google: deve abrir `/inicio` automaticamente, sem nova tela de login.
 3. Recarregue e feche/reabra o navegador: a sessão deve ser restaurada enquanto
    válida; a tela promocional não deve aparecer durante a verificação.
-4. Confira os quatro planos e os links do WhatsApp; cada mensagem deve trazer
+4. Confira os quatro planos no Assistente MCZ; a mensagem final deve trazer
    o plano e o preço corretos, sem envio automático.
 5. Use Sair da conta: deve voltar à oferta pública e bloquear `/inicio`.
 6. Cancele o popup e simule bloqueio/falha de rede; deve haver mensagem útil e

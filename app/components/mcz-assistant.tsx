@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useReducer, useRef, useState } from "react";
+import { assistantOpenEvent } from "./plan-assistant-button";
+import { plans } from "@/lib/site/plans";
 import { useAuth } from "./auth/auth-provider";
 import { assistantGreeting, assistantReducer, attendantLink, initialAssistantState } from "@/lib/site/assistant";
 
@@ -19,6 +21,18 @@ export function MczAssistant() {
     if (open && history.current) history.current.scrollTop = history.current.scrollHeight;
   }, [open, state.messages]);
 
+  useEffect(() => {
+    function openPlan(event: Event) {
+      const plan = plans.find((plan) => plan.id === (event as CustomEvent).detail);
+      if (!plan) return;
+      dispatch({ id: `plano:${plan.id}`, label: `Escolher plano ${plan.name}` });
+      setOpen(true);
+      heading.current?.focus();
+    }
+    window.addEventListener(assistantOpenEvent, openPlan);
+    return () => window.removeEventListener(assistantOpenEvent, openPlan);
+  }, []);
+
   function hide() {
     setOpen(false);
     launcher.current?.focus();
@@ -32,6 +46,7 @@ export function MczAssistant() {
         <p className="assistant-message">{assistantGreeting(user?.displayName)}</p>
         {state.messages.map((message, index) => <p className={`assistant-message ${message.role === "user" ? "from-user" : ""}`} key={index}><span className="sr-only">{message.role === "user" ? "Você: " : "Assistente virtual: "}</span>{message.text}</p>)}
       </div>
+      {state.selectedPlan && <p className="assistant-selected-plan">Plano selecionado: {state.selectedPlan.name}</p>}
       <div className="assistant-options" aria-label="Opções de atendimento">{state.reply.options.map((option) => <button type="button" key={option.id} onClick={() => dispatch(option)}>{option.label}</button>)}{state.reply.link && <a className="assistant-contact" href={state.reply.link.href} target="_blank" rel="noopener noreferrer">{state.reply.link.label}<span className="sr-only"> (abre o WhatsApp em outra aba)</span></a>}</div>
       <footer className="assistant-footer"><button type="button" onClick={() => dispatch({ id: "inicio", label: "Voltar ao início" })}>Voltar ao início</button><a href={state.compatibilityContact ?? attendantLink} target="_blank" rel="noopener noreferrer">Falar com atendente<span className="sr-only"> (abre o WhatsApp em outra aba)</span></a></footer>
     </section>}
