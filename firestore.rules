@@ -1,0 +1,30 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function googleUser() {
+      return request.auth != null && request.auth.token.firebase.sign_in_provider == 'google.com';
+    }
+    match /reviews/{reviewId} {
+      allow get: if (googleUser() && request.auth.uid == reviewId) || resource.data.status == 'approved';
+      allow list: if resource.data.status == 'approved' && request.query.limit != null && request.query.limit <= 24;
+      allow create: if googleUser()
+        && reviewId == request.auth.uid
+        && request.resource.data.keys().hasAll(['userId', 'publicName', 'photoURL', 'rating', 'comment', 'createdAt', 'status'])
+        && request.resource.data.keys().hasOnly(['userId', 'publicName', 'photoURL', 'rating', 'comment', 'createdAt', 'status'])
+        && request.resource.data.userId == request.auth.uid
+        && request.auth.token.name is string
+        && request.resource.data.publicName == request.auth.token.name.split(' ')[0]
+        && request.resource.data.publicName.size() > 0 && request.resource.data.publicName.size() <= 80
+        && request.resource.data.photoURL is string
+        && (request.resource.data.photoURL == '' || request.resource.data.photoURL == request.auth.token.get('picture', ''))
+        && request.resource.data.rating is int && request.resource.data.rating >= 1 && request.resource.data.rating <= 5
+        && request.resource.data.comment is string
+        && request.resource.data.comment.size() >= 10 && request.resource.data.comment.size() <= 1000
+        && request.resource.data.comment.matches('[\\s\\S]*[^\\s][\\s\\S]*')
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.status == 'pending';
+      // Moderation is exclusively through trusted Console IAM/Admin access.
+      allow update, delete: if false;
+    }
+  }
+}

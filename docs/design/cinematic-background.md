@@ -1,0 +1,18 @@
+# Fundo cinematográfico MCZ onTV
+
+Modo: ferramenta integrada `image_gen` (sem CLI/API externa).
+Assets locais WebP, convertidos dos PNGs gerados sem recorte ou alterações na composição. Nenhuma dependência instalada.
+
+- `public/images/mcz-entry-cinema-desktop.webp`
+- `public/images/mcz-entry-cinema-mobile.webp`
+
+A camada decorativa fica restrita à tela pública (`.entry-page::before`). O overlay é feito em CSS. A variante mobile preserva a composição vertical inteira. Planos, autenticação, WhatsApp e layout dos blocos não foram alterados.
+
+## Prompt desktop
+
+Use case: ads-marketing. Asset type: local desktop cinematic background artwork for the existing MCZ onTV entertainment login landing page; image only, not a website mockup. Generate a wide 16:9 landscape composition, ideally 2048x1152. Scene: premium dark cinematic media room, large modern thin-bezel Smart TV centrally featured, fully inside the composition with generous margins. A few smaller screens recede in depth behind it, showing original abstract cinematic scenes of atmospheric mountains and a nighttime futuristic city, without words or recognizable intellectual property. At the far left, three generic wholly fictional action-adventure character silhouettes, full silhouettes with understated coats and neutral futuristic clothing, no identifiable faces, no famous character costumes or franchise references. Smart TV remains the strongest visual feature; the silhouettes and smaller screens are supporting scenery. Elegant realistic 3D cinematic art direction, midnight navy and near-black palette, controlled cyan/blue screen glow, small violet accents, subtle haze and depth, no excessive effects. This artwork will sit behind an unchanged two-column UI, offer at left and Google login card at right: provide low-contrast dark areas behind both, preserve screen outlines near upper-center and outer edges. Do not bake in UI, login buttons, prices, logos, titles, typography, captions, watermark or any text. Keep key devices entirely inside the frame, no cropped character heads, no copyrighted characters or branded screens. The final webpage will apply its own dark overlay.
+
+## Prompt mobile
+
+Use case: ads-marketing. Asset type: portrait mobile background artwork for the existing MCZ onTV entertainment login landing page. Reference image: the attached generated desktop cinema scene, used for its navy/cyan/violet palette, Smart TV design, and cinematic realism. Create a separately art-directed PORTRAIT 2:3 composition, ideally 1024x1536, rather than a crop of the landscape. Preserve the scene concept: one prominent large thin-bezel Smart TV FULLY VISIBLE with margin around every corner, two or three smaller screens behind it in depth, screens showing original atmospheric mountains and nighttime futuristic city scenes. Place three generic wholly fictional action-adventure silhouettes together along the left side; full figures inside the composition with margin, understated coats/neutral futuristic clothing, no recognizable faces, costumes or franchises. Keep the entire TV and silhouettes well inside the portrait frame so a webpage can show this whole image at 100% width without odd cuts. Simplify any peripheral room furniture, prioritize TV and screen cluster; tasteful cinematic depth, subtle haze, deep midnight navy, low-contrast blue/cyan highlights and small violet glow, no excessive effects. Keep the very top and bottom dark and allow a smooth dark fade at the bottom so the image integrates with a near-black page. No text, logos, UI, prices, buttons, captions, watermarks or real movie/show/franchise references. This is background art only, not a webpage mockup; an additional dark CSS overlay will protect foreground offer and login readability.
+
