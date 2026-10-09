@@ -3,8 +3,9 @@
 import { useEffect, useReducer, useRef, useState } from "react";
 import { assistantOpenEvent } from "./plan-assistant-button";
 import { plans } from "@/lib/site/plans";
+import { resellerPackages, resellerAssistantOpenEvent } from "@/lib/site/reseller";
 import { useAuth } from "./auth/auth-provider";
-import { assistantGreeting, assistantReducer, attendantLink, initialAssistantState } from "@/lib/site/assistant";
+import { assistantGreeting, assistantReducer, attendantLink, resellerAttendantLink, initialAssistantState } from "@/lib/site/assistant";
 
 export function MczAssistant() {
   const { user } = useAuth();
@@ -29,8 +30,20 @@ export function MczAssistant() {
       setOpen(true);
       heading.current?.focus();
     }
+    function openReseller(event: Event) {
+      const detail = (event as CustomEvent).detail;
+      if (detail?.type !== "revenda") return;
+      const pkg = resellerPackages.find((item) => item.id === detail.packageId);
+      if (!pkg) return;
+      dispatch({ id: `revenda:pacote:${pkg.id}`, label: `Escolher pacote de ${pkg.credits} créditos` });
+      setOpen(true);
+    }
     window.addEventListener(assistantOpenEvent, openPlan);
-    return () => window.removeEventListener(assistantOpenEvent, openPlan);
+    window.addEventListener(resellerAssistantOpenEvent, openReseller);
+    return () => {
+      window.removeEventListener(assistantOpenEvent, openPlan);
+      window.removeEventListener(resellerAssistantOpenEvent, openReseller);
+    };
   }, []);
 
   function hide() {
@@ -47,8 +60,9 @@ export function MczAssistant() {
         {state.messages.map((message, index) => <p className={`assistant-message ${message.role === "user" ? "from-user" : ""}`} key={index}><span className="sr-only">{message.role === "user" ? "Você: " : "Assistente virtual: "}</span>{message.text}</p>)}
       </div>
       {state.selectedPlan && <p className="assistant-selected-plan">Plano selecionado: {state.selectedPlan.name}</p>}
+      {state.selectedPackage && <p className="assistant-selected-plan">Revenda: pacote de {state.selectedPackage.credits} créditos</p>}
       <div className="assistant-options" aria-label="Opções de atendimento">{state.reply.options.map((option) => <button type="button" key={option.id} onClick={() => dispatch(option)}>{option.label}</button>)}{state.reply.link && <a className="assistant-contact" href={state.reply.link.href} target="_blank" rel="noopener noreferrer">{state.reply.link.label}<span className="sr-only"> (abre o WhatsApp em outra aba)</span></a>}</div>
-      <footer className="assistant-footer"><button type="button" onClick={() => dispatch({ id: "inicio", label: "Voltar ao início" })}>Voltar ao início</button><a href={attendantLink} target="_blank" rel="noopener noreferrer">Falar com atendente<span className="sr-only"> (abre o WhatsApp em outra aba)</span></a></footer>
+      <footer className="assistant-footer"><button type="button" onClick={() => dispatch({ id: state.selectedPackage ? "revenda:pacotes" : "inicio", label: "Voltar ao início" })}>Voltar ao início</button><a href={state.selectedPackage ? resellerAttendantLink(state.selectedPackage) : attendantLink} target="_blank" rel="noopener noreferrer">Falar com atendente<span className="sr-only"> (abre o WhatsApp em outra aba)</span></a></footer>
     </section>}
     <button ref={launcher} type="button" className="assistant-launcher" aria-expanded={open} aria-controls={open ? "mcz-assistant-chat" : undefined} onClick={() => open ? hide() : setOpen(true)}><span>🤖 Assistente MCZ</span><small><span aria-hidden="true" /> Guiado</small></button>
   </div>;

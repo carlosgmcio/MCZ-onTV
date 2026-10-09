@@ -15,7 +15,8 @@ function load(file, modules = {}, globals = {}) {
 const whatsapp = load("lib/site/whatsapp.ts");
 const plans = load("lib/site/plans.ts", { "./whatsapp": whatsapp });
 const compatibility = load("lib/site/compatibility.ts");
-const engine = load("lib/site/assistant.ts", { "./plans": plans, "./compatibility": compatibility, "./whatsapp": whatsapp });
+const reseller = load("lib/site/reseller.ts");
+const engine = load("lib/site/assistant.ts", { "./plans": plans, "./compatibility": compatibility, "./whatsapp": whatsapp, "./reseller": reseller });
 function nodes(tree) {
   if (!tree || typeof tree !== "object") return [];
   if (Array.isArray(tree)) return tree.flatMap(nodes);
@@ -35,7 +36,7 @@ test("every card opens the existing assistant with its plan, without navigating;
     useRef(initial) { const index = cursor++; if (!(index in slots)) slots[index] = { current: initial }; return slots[index]; },
     useEffect(fn) { effects.push(fn); },
   };
-  const ui = load("app/components/mcz-assistant.tsx", { react, "./auth/auth-provider": { useAuth: () => ({ user: null }) }, "./plan-assistant-button": buttons, "@/lib/site/plans": plans, "@/lib/site/assistant": engine }, { window });
+  const ui = load("app/components/mcz-assistant.tsx", { react, "./auth/auth-provider": { useAuth: () => ({ user: null }) }, "./plan-assistant-button": buttons, "@/lib/site/plans": plans, "@/lib/site/assistant": engine, "@/lib/site/reseller": reseller }, { window });
   function render() { cursor = 0; return nodes(ui.MczAssistant()); }
   render();
   const cleanups = effects.map((fn) => fn());

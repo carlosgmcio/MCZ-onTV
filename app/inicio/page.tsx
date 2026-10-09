@@ -12,7 +12,7 @@ import { plans, planDuration } from "@/lib/site/plans";
 
 export const metadata: Metadata = { title: "Planos e entretenimento | MCZ onTV" };
 
-const navItems = [{ label: "Início", href: "#inicio" }, { label: "Planos", href: "#planos" }, { label: "Como contratar", href: "#como-contratar" }, { label: "Atendimento", href: "#atendimento" }];
+const navItems = [{ label: "Início", href: "#inicio" }, { label: "Planos", href: "#planos" }, { label: "Como contratar", href: "#como-contratar" }, { label: "Atendimento", href: "#atendimento" }, { label: "Seja um revendedor", href: "/revendedor" }];
 const faqs = [
   { question: "O login já contrata ou ativa um plano?", answer: "Não. O login permite conhecer os planos. A contratação e a orientação sobre ativação são feitas manualmente pelo atendimento no WhatsApp." },
   { question: "Como faço para contratar?", answer: "Escolha um plano para abrir o Assistente MCZ. Consulte as condições, confira o resumo e finalize pelo WhatsApp." },

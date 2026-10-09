@@ -9,6 +9,21 @@ Veja [configuração, regras e publicação automática](docs/reviews.md) antes 
 
 ## Assistente Virtual MCZ
 
+### Revendedores
+
+A rota pública `/revendedor` apresenta os seis pacotes oficiais configurados em
+`lib/site/reseller.ts`. O simulador começa em R$25,00 por crédito, aceita preços
+maiores sem teto de R$50,00 e calcula faturamento, resultado bruto e créditos
+restantes. Vendas parciais descontam o investimento total do pacote. Reinvestimento
+usa o faturamento recebido e não desconta novamente o primeiro investimento;
+se o caixa não cobrir a recompra, mostra o valor que falta.
+
+Os botões de pacote abrem o mesmo Assistente MCZ com contexto de revenda. A
+finalização humana usa o WhatsApp oficial com quantidade e preço do pacote.
+Não há compra automática nem promessa de vendas ou lucro. Taxas, impostos e
+outros custos não entram nas simulações. Execute `npm test` para validar os
+cálculos, preços livres e integração com o assistente.
+
 O botão flutuante abre um atendimento guiado com respostas locais, sem API de
 IA, servidor de chat ou processamento de pagamentos. A janela e o botão
 identificam explicitamente o atendimento como guiado por opções.

@@ -13,7 +13,8 @@ function load(file, modules = {}) {
 const whatsapp = load("lib/site/whatsapp.ts");
 const plans = load("lib/site/plans.ts", { "./whatsapp": whatsapp });
 const compatibility = load("lib/site/compatibility.ts");
-const assistant = load("lib/site/assistant.ts", { "./plans": plans, "./compatibility": compatibility, "./whatsapp": whatsapp });
+const reseller = load("lib/site/reseller.ts");
+const assistant = load("lib/site/assistant.ts", { "./plans": plans, "./compatibility": compatibility, "./whatsapp": whatsapp, "./reseller": reseller });
 
 test("welcome offers five guided paths and uses only first name", () => {
   assert.equal(assistant.homeOptions.length, 5);

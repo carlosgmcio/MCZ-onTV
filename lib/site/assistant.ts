@@ -3,6 +3,7 @@ export { attendantLink } from "./whatsapp";
 import { plans, planValue, planDescription, type Plan } from "./plans";
 export { planValue } from "./plans";
 import { compatibility } from "./compatibility";
+import { resellerPackages, packageDescription, resellerContactMessage, resalePriceNotice, resellerDisclaimer, type ResellerPackage } from "./reseller";
 
 export type AssistantOption = { id: string; label: string };
 export type AssistantReply = {
@@ -34,6 +35,35 @@ const planOptions: AssistantOption[] = [
   { id: "continuar", label: "✅ Continuar contratação" },
   { id: "trocar", label: "🔄 Escolher outro plano" },
 ];
+export function resellerAttendantLink(pkg: ResellerPackage): string {
+  return contactLink(resellerContactMessage(pkg));
+}
+const resellerOptions: AssistantOption[] = [
+  { id: "revenda:pacotes", label: "Ver outros pacotes" },
+  { id: "revenda:preco", label: "Como definir meu preço?" },
+  { id: "revenda:funciona", label: "Como funciona a revenda?" },
+  { id: "revenda:continuar", label: "Continuar com o pacote escolhido" },
+];
+function resellerReply(id: string, pkg?: ResellerPackage): AssistantReply {
+  if (id === "revenda:pacotes" || !pkg) return {
+    text: `Atendimento: Revenda\n\nPacotes cadastrados:\n${resellerPackages.map(packageDescription).join("\n")}\n\nEscolha o pacote para conversar com o atendimento.`,
+    options: resellerPackages.map((item) => ({ id: `revenda:pacote:${item.id}`, label: packageDescription(item) })),
+  };
+  if (id === "revenda:preco") return { text: `${resalePriceNotice}\n\n${resellerDisclaimer}`, options: resellerOptions };
+  if (id === "revenda:funciona") return {
+    text: "Escolha seu pacote e confirme as condições com o atendimento humano. Após a confirmação, receba os créditos conforme as condições contratadas e revenda aos seus clientes. O site não compra créditos nem realiza cobranças automaticamente.\n\n" + resellerDisclaimer,
+    options: resellerOptions,
+  };
+  if (id === "revenda:continuar") return {
+    text: `Atendimento: Revenda\nPacote escolhido: ${packageDescription(pkg)}\n\nFinalize com o atendente para confirmar as condições. A mensagem será aberta no WhatsApp e você poderá enviá-la.`,
+    options: resellerOptions.filter((option) => option.id !== "revenda:continuar"),
+    link: { label: "💬 Finalizar com atendente", href: resellerAttendantLink(pkg) },
+  };
+  return {
+    text: `Atendimento: Revenda\n\n${resellerContactMessage(pkg)}\n${packageDescription(pkg)}\n\nVocê pode conhecer os outros pacotes, tirar dúvidas sobre preço ou continuar com o atendimento humano.`,
+    options: resellerOptions,
+  };
+}
 export function assistantReply(id: string, context?: Pick<AssistantState, "selectedPlan" | "consultedDevice">): AssistantReply {
   const selected = plans.find((plan) => id === `plano:${plan.id}`) ?? context?.selectedPlan;
   if (id.startsWith("plano:") && selected) return {
@@ -73,9 +103,14 @@ export function assistantReply(id: string, context?: Pick<AssistantState, "selec
   return flows.inicio;
 }
 
-export type AssistantState = { messages: { role: "user" | "assistant"; text: string }[]; reply: AssistantReply; compatibilityContact?: string; selectedPlan?: Plan; consultedDevice?: string };
+export type AssistantState = { messages: { role: "user" | "assistant"; text: string }[]; reply: AssistantReply; compatibilityContact?: string; selectedPlan?: Plan; consultedDevice?: string; selectedPackage?: ResellerPackage };
 export const initialAssistantState: AssistantState = { messages: [], reply: assistantReply("inicio") };
 export function assistantReducer(state: AssistantState, option: AssistantOption): AssistantState {
+  if (option.id.startsWith("revenda:")) {
+    const selectedPackage = resellerPackages.find((pkg) => option.id === `revenda:pacote:${pkg.id}`) ?? state.selectedPackage;
+    const reply = resellerReply(option.id, selectedPackage);
+    return { reply, selectedPackage, messages: [...state.messages, { role: "user", text: option.label }, { role: "assistant", text: reply.text }] };
+  }
   const selectedPlan = plans.find((plan) => option.id === `plano:${plan.id}`) ?? state.selectedPlan;
   const device = compatibility.find((device) => device.id === option.id);
   const system = compatibility.flatMap((device) => device.systems).find((system) => option.id === `compat:${system.id}`);
