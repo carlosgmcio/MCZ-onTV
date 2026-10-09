@@ -10,12 +10,11 @@ Veja [configuração, regras e publicação automática](docs/reviews.md) antes 
 ## Assistente Virtual MCZ
 
 O botão flutuante abre um atendimento guiado com respostas locais, sem API de
-IA, servidor de chat ou processamento de pagamentos. “Online” indica que o
-assistente virtual está disponível; não representa a presença de um atendente
-humano. A janela identifica explicitamente as respostas como guiadas.
+IA, servidor de chat ou processamento de pagamentos. A janela e o botão
+identificam explicitamente o atendimento como guiado por opções.
 
-Edite perguntas, respostas e opções em `lib/site/assistant.ts`. Os preços e a
-promoção vêm de `lib/site/plans.ts`, sem uma segunda tabela de preços. Os links
+Edite perguntas, respostas e opções em `lib/site/assistant.ts`. Os preços, períodos e
+descrições vêm de `lib/site/plans.ts`, sem uma segunda tabela de preços. Os links
 de contratação incluem o plano escolhido e usam o número já configurado no site.
 Compatibilidade depende do aparelho e é encaminhada ao atendimento. Nenhuma
 mensagem é enviada automaticamente: o visitante abre o WhatsApp e a envia.
@@ -26,9 +25,8 @@ observações, necessidade de confirmação e mensagem de atendimento. Cadastre
 somente compatibilidades confirmadas. Celulares e tablets Android permanecem
 sem aplicativos cadastrados e são encaminhados ao atendente; as opções Android
 de TV/TV Box não são automaticamente atribuídas a celulares ou tablets.
-O botão permanente “Falar com atendente” preserva o contexto de compatibilidade
-selecionado, mesmo ao consultar os planos. Voltar aos aparelhos/início reinicia
-esse contexto sem apagar o histórico.
+O botão permanente “Falar com atendente” usa a mensagem de atendimento da MCZ onTV.
+Os links específicos de compatibilidade preservam o contexto consultado.
 
 A interface está em `app/components/mcz-assistant.tsx`, montada no layout para
 preservar o histórico durante a navegação interna. Minimizar ou fechar oculta a
@@ -116,13 +114,14 @@ avaliações com moderação.
 - `/meus-pedidos`: redireciona bookmarks antigos à entrada, sem funcionalidades
   de pedidos ou conteúdo do projeto comercial anterior.
 
-A oferta é **R$15,00/mês durante os 6 primeiros meses**; depois, R$25,00/mês.
-É exclusiva para novos clientes. Os demais planos são R$60,00 por 3 meses,
-R$120,00 por 6 meses e R$230,00 por 12 meses.
+O plano mensal custa **R$25,00 por 1 mês**, sem promoção para novos clientes.
+Os demais planos são R$60,00 por 3 meses, R$120,00 por 6 meses e R$230,00 por 12 meses.
+O Assistente MCZ apresenta os valores e descrições cadastrados e funciona por opções, sem backend de IA.
+Ao continuar a contratação, disponibiliza “Finalizar com atendente”; o cliente pode tirar dúvidas antes de abrir o WhatsApp.
 
-Planos e mensagens estão centralizados em `lib/site/plans.ts`. Os quatro cards
-abrem o Assistente MCZ com o plano selecionado. Após o resumo, o botão final
-abre o WhatsApp **(82) 99431-0121**, com plano, valor e contexto consultado.
+Planos ficam em `lib/site/plans.ts`; o número e a geração dos links ficam em `lib/site/whatsapp.ts`. Os quatro cards
+abrem o Assistente MCZ com o plano selecionado. Ao continuar a contratação, o botão final
+abre o WhatsApp **(82) 99963-5731**, com plano, valor e contexto consultado.
 O usuário ainda precisa enviar a mensagem; contratação e atendimento são manuais.
 
 ## Desenvolvimento
@@ -180,7 +179,7 @@ Após configurar as variáveis:
    no celular. Abrir `/inicio` diretamente deve retornar à oferta pública.
 2. Entre com Google: deve abrir `/inicio` automaticamente, sem nova tela de login.
 3. Recarregue e feche/reabra o navegador: a sessão deve ser restaurada enquanto
-   válida; a tela promocional não deve aparecer durante a verificação.
+   válida; a tela de entrada não deve aparecer durante a verificação.
 4. Confira os quatro planos no Assistente MCZ; a mensagem final deve trazer
    o plano e o preço corretos, sem envio automático.
 5. Use Sair da conta: deve voltar à oferta pública e bloquear `/inicio`.

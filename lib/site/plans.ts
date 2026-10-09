@@ -1,10 +1,4 @@
-export const promotion = {
-  price: "15,00",
-  months: 6,
-  regularPrice: "25,00",
-  description: "R$15,00/mês durante os 6 primeiros meses. Após esse período, R$25,00/mês.",
-  eligibility: "Oferta válida exclusivamente para novos clientes.",
-};
+import { whatsappLink as createWhatsappLink } from "./whatsapp";
 
 export const plans = [
   { id: "mensal", name: "Mensal", price: "25,00", months: 1, period: "/mês", summary: "Um mês de entretenimento por vez." },
@@ -15,12 +9,21 @@ export const plans = [
 
 export type Plan = (typeof plans)[number];
 
-export const whatsappNumber = "5582994310121";
-export const whatsappDisplayNumber = "(82) 99431-0121";
+export function planDuration(plan: Plan): string {
+  return `${plan.months} ${plan.months === 1 ? "mês" : "meses"}`;
+}
+
+export function planValue(plan: Plan): string {
+  return `R$${plan.price} / ${planDuration(plan)}`;
+}
+
+export function planDescription(plan: Plan): string {
+  return `${plan.name} — ${planValue(plan)}\n${plan.summary}`;
+}
 
 export function whatsappLink(plan?: Plan): string {
   const message = plan
-    ? `Olá, MCZ onTV! Quero contratar o plano ${plan.name}: R$${plan.price}${plan.period}. ${plan.id === "mensal" ? `Gostaria de consultar a oferta para novos clientes: ${promotion.description} ` : ""}Pode me informar as condições e orientar a contratação?`
+    ? `Olá, MCZ onTV! Quero contratar o plano ${plan.name}: ${planValue(plan)}. Pode me informar as condições e orientar a contratação?`
     : "Olá, MCZ onTV! Gostaria de conhecer os planos e as condições de contratação.";
-  return `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+  return createWhatsappLink(message);
 }

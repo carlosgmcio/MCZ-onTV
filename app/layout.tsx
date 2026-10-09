@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "MCZ onTV | Seu entretenimento começa aqui.",
-  description: "Oferta exclusiva para novos clientes: R$15,00/mês durante os 6 primeiros meses. Após esse período, R$25,00/mês. Conheça os planos MCZ onTV.",
+  description: "Conheça os planos MCZ onTV, escolha com o Assistente MCZ e finalize pelo atendimento humano.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

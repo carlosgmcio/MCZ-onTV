@@ -148,20 +148,20 @@ test("entry and member gates hide wrong content and route correctly after restor
 });
 
 test("all four WhatsApp links include the correct plan, price and destination", () => {
-  const { plans, promotion, whatsappLink } = loadModule("lib/site/plans.ts");
+  const { plans, whatsappLink } = loadModule("lib/site/plans.ts", { require: () => loadModule("lib/site/whatsapp.ts") });
   assert.deepEqual(Array.from(plans, (plan) => [plan.name, plan.price, plan.months]), [
     ["Mensal", "25,00", 1], ["Trimestral", "60,00", 3], ["Semestral", "120,00", 6], ["Anual", "230,00", 12],
   ]);
   for (const plan of plans) {
     const url = new URL(whatsappLink(plan));
     assert.equal(url.origin, "https://wa.me");
-    assert.equal(url.pathname, "/5582994310121");
-    assert.ok(url.searchParams.get("text").includes(`plano ${plan.name}: R$${plan.price}${plan.period}`));
+    assert.equal(url.pathname, "/5582999635731");
+    assert.ok(url.searchParams.get("text").includes(`plano ${plan.name}: R$${plan.price} / ${plan.months} ${plan.months === 1 ? "m\u00eas" : "meses"}`));
   }
   const monthlyMessage = new URL(whatsappLink(plans[0])).searchParams.get("text");
-  assert.ok(monthlyMessage.includes(promotion.description));
-  assert.match(monthlyMessage, /R\$15,00\/mês durante os 6 primeiros meses/);
-  assert.match(monthlyMessage, /Após esse período, R\$25,00\/mês/);
+  assert.ok(monthlyMessage.includes("R$25,00 / 1 m\u00eas"));
+  assert.ok(!monthlyMessage.includes("15,00"));
+  assert.ok(!monthlyMessage.includes("novos clientes"));
   assert.equal(plans[3].badge, "MELHOR CUSTO-BENEFÍCIO");
 });
 
